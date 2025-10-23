@@ -19,7 +19,7 @@ tidy:
 	$(GO_MOD_TIDY)
 
 build: tidy
-	$(GO_BUILD)
+	GOARCH=$(TARGET) $(GO_BUILD)
 
 clean:
 	rm -f $(BPF_OUTPUT)_$(TARGET)_bpfel.go $(BPF_OUTPUT)_$(TARGET)_bpfel.o $(BINARY_NAME)

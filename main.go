@@ -245,12 +245,22 @@ func main() {
 				continue
 			}
 
+			packageName, err := GetPackageNameByUid(int(event.Uid))
+			if err != nil {
+				packageName = fmt.Sprintf("%d", event.Uid)
+			}
+
 			parcelData := completeData[:event.DataSize-1]
 
 			interfaceToken, err := ExtractInterfaceName(parcelData)
 
 			if err != nil {
 				logger.Println("Error parsing parcel:", err)
+				if conf.Args {
+					logger.Printf("(pid:%d, uid:%d, handle: %x, package:%s, addr:%x, ret: %x)\n%s", event.Pid, event.Uid, event.Handle, packageName, event.Addr, event.Ret, spew.Sdump(parcelData))
+				} else {
+					logger.Printf("(pid:%d, uid:%d, handle: %x, package:%s, addr:%x, ret: %x)\n", event.Pid, event.Uid, event.Handle, packageName, event.Addr, event.Ret)
+				}
 				continue
 			}
 
@@ -263,15 +273,10 @@ func main() {
 				continue
 			}
 
-			packageName, err := GetPackageNameByUid(int(event.Uid))
-			if err != nil {
-				packageName = fmt.Sprintf("%d", event.Uid)
-			}
-
 			if conf.Args {
-				logger.Printf("(pid:%d, uid:%d, package:%s) -> (interface:%s, method:%s)\n%s", event.Pid, event.Uid, packageName, interfaceToken, methodName, spew.Sdump(parcelData))
+				logger.Printf("(pid:%d, uid:%d, handle: %x, package:%s, addr:%x, ret: %x) -> (interface:%s, method:%s)\n%s", event.Pid, event.Uid, event.Handle, packageName, event.Addr, event.Ret, interfaceToken, methodName, spew.Sdump(parcelData))
 			} else {
-				logger.Printf("(pid:%d, uid:%d, package:%s) -> (interface:%s, method:%s)\n", event.Pid, event.Uid, packageName, interfaceToken, methodName)
+				logger.Printf("(pid:%d, uid:%d, handle: %x, package:%s, addr:%x, ret: %x) -> (interface:%s, method:%s)\n", event.Pid, event.Uid, event.Handle, packageName, event.Addr, event.Ret, interfaceToken, methodName)
 			}
 		}
 	}
